@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cari Teman Palsumu 💌</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;padding:20px;font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#30243b;background:linear-gradient(145deg,#ffe1ef,#eee5ff 55%,#def5ff)}
+main{max-width:650px;margin:auto}.card{background:#fffffff2;border-radius:25px;padding:24px;box-shadow:0 16px 45px #6b43851c}h1{font-size:clamp(28px,7vw,40px);line-height:1.1;margin:8px 0}.sub{color:#786d83;line-height:1.5}.emoji{font-size:43px}.pill{display:inline-block;background:#f5eafa;color:#6843a0;border-radius:99px;padding:6px 11px;font-size:12px;font-weight:800}label{display:block;font-weight:750;margin:17px 0 8px}input{width:100%;padding:13px;border:1.5px solid #e5d8ee;border-radius:13px;font:inherit}button{border:0;border-radius:14px;padding:13px 17px;font:700 15px inherit;cursor:pointer}.primary{width:100%;margin-top:19px;color:#fff;background:linear-gradient(100deg,#ff5c9a,#8057d8)}.secondary{background:#f1eafa;color:#62419b}.top{display:flex;justify-content:space-between;color:#786d83;font-size:13px;font-weight:700}.bar{height:7px;background:#eee7f3;border-radius:9px;overflow:hidden;margin:12px 0 23px}.fill{height:100%;width:0;background:linear-gradient(90deg,#ff5c9a,#8057d8);transition:.2s}.options{display:grid;gap:10px;margin-top:17px}.opt{width:100%;background:#fff;color:#30243b;border:1.5px solid #e9deef;text-align:left}.opt.selected{border-color:#8057d8;background:#f3edff}.hidden{display:none}.notice{padding:12px 14px;background:#fff4d9;border-radius:13px;color:#70551e;font-size:13px;margin:15px 0}.result{text-align:center}.score{font-size:54px;font-weight:900;color:#8057d8;margin:10px}.actions{display:flex;gap:10px;margin-top:18px}.actions button{flex:1}.small{font-size:12px;color:#786d83;text-align:center;margin-top:18px}
+</style>
+</head>
+<body>
+<main>
+
+<section class="card" id="home">
+ <div class="emoji">💌🕵️</div><span class="pill">CARI TEMAN PALSUMU</span>
+ <h1>Seberapa kenal kamu sama temanmu?</h1>
+ <p class="sub">Orang pertama membuat kuis dan menentukan jawaban yang benar. Setelah itu, teman tinggal menebak. Jadi bukan asal pencet jawaban seperti manusia yang sedang dikejar deadline. 🗿</p>
+ <button class="primary" id="createBtn">Buat Kuis ✨</button>
+ <button class="primary" id="joinBtn" style="background:#8057d8">Mulai Menebak 🎯</button>
+ <p class="small">Untuk dimainkan berdua pada perangkat yang sama.</p>
+</section>
+
+<section class="card hidden" id="setup">
+ <span class="pill">TAHAP 1 · PEMBUAT</span>
+ <h1>Buat pertanyaan untuk temanmu</h1>
+ <p class="sub">Masukkan nama teman, lalu pilih jawaban yang <b>sebenarnya</b> sesuai dengan dirinya.</p>
+ <label>Nama teman</label><input id="creatorName" placeholder="Contoh: Aurel">
+ <div id="setupQuestions"></div>
+ <button class="primary" id="saveQuiz">Simpan & Mulai Tebak 🎯</button>
+ <button class="primary" id="back1" style="background:#eee7f5;color:#62419b">Kembali</button>
+</section>
+
+<section class="card hidden" id="quiz">
+ <div class="top"><span id="quizName"></span><span id="counter"></span></div>
+ <div class="bar"><div class="fill" id="fill"></div></div>
+ <h2 id="q"></h2><p class="sub">Menurutmu, jawaban temanmu apa?</p>
+ <div class="options" id="quizOptions"></div>
+ <button class="primary" id="next" disabled>Lanjut ➜</button>
+</section>
+
+<section class="card hidden result" id="result">
+ <div class="emoji">🏆💖</div><span class="pill">HASILNYA!</span>
+ <h1 id="resultTitle"></h1>
+ <div class="score" id="score"></div>
+ <p class="sub" id="resultText"></p>
+ <p id="mistakes"></p>
+ <div class="actions"><button class="primary" id="again">Buat Kuis Baru</button><button class="secondary" id="redo">Tebak Lagi</button></div>
+ <p class="small">Jawaban benar sudah dibandingkan otomatis.</p>
+</section>
+
+</main>
+<script>
+const questions=[
+["Kalau mau jajan, dia paling mungkin memilih…",["Seblak atau makanan pedas","Cokelat dan makanan manis","Mie ayam atau bakso","Apa saja yang penting enak"]],
+["Musik yang kemungkinan paling sering dia dengarkan?",["Pop/K-pop","Lagu galau","Hip-hop atau rap","Playlist campur aduk"]],
+["Hal yang paling mungkin bikin dia kesal?",["Dibohongi","Dicuekin","Ditunggu terlalu lama","Diganggu saat fokus"]],
+["Kalau punya waktu luang, dia biasanya…",["Main game","Nonton film/series","Scroll media sosial","Tidur"]],
+["Minuman yang paling mungkin dia pilih?",["Es teh","Matcha atau kopi susu","Jus buah","Air putih"]],
+["Kalau sedang bad mood, dia cenderung…",["Diam dulu","Curhat ke teman","Bercanda biar lupa","Menyendiri sambil dengar musik"]],
+["Tempat yang paling dia suka buat jalan-jalan?",["Mal","Kafe lucu","Pantai/gunung","Di rumah saja"]],
+["Kebiasaan yang paling menggambarkan dia?",["Sering telat","Banyak ngomong","Suka overthinking","Random dan susah ditebak"]],
+["Kalau dapat uang jajan lebih, dia kemungkinan…",["Ditabung","Beli makanan","Belanja barang lucu","Langsung habis"]],
+["Hal kecil yang paling bikin dia senang?",["Dapat hadiah","Diperhatikan","Dipuji","Quality time bareng teman"]],
+["Kalau jadi karakter film, perannya mungkin…",["Tokoh utama ceria","Si misterius","Si kocak","Tokoh pintar yang punya rencana"]],
+["Seberapa cepat dia membalas chat?",["Secepat kilat","Kalau ingat","Lama, tapi tiba-tiba online","Voice note panjang"]]
+];
+
+let key=[], guesses=[], i=0, friend="";
+const $=x=>document.getElementById(x);
+function buildSetup(){
+ $("setupQuestions").innerHTML="";
+ questions.forEach((item,n)=>{
+  const wrap=document.createElement("div"); wrap.innerHTML=`<label>${n+1}. ${item[0]}</label>`;
+  const box=document.createElement("div"); box.className="options";
+  item[1].forEach((a,j)=>{let b=document.createElement("button");b.type="button";b.className="opt";b.textContent=String.fromCharCode(65+j)+". "+a;b.onclick=()=>{key[n]=j;box.querySelectorAll("button").forEach(x=>x.classList.remove("selected"));b.classList.add("selected")};box.appendChild(b)});
+  wrap.appendChild(box);$("setupQuestions").appendChild(wrap);
+ });
+}
+$("createBtn").onclick=()=>{buildSetup();$("home").classList.add("hidden");$("setup").classList.remove("hidden")};
+$("back1").onclick=()=>{$("setup").classList.add("hidden");$("home").classList.remove("hidden")};
+$("saveQuiz").onclick=()=>{
+ friend=$("creatorName").value.trim()||"Temanmu";
+ if(key.length!==questions.length||key.some(x=>x===undefined)){alert("Pilih jawaban benar untuk semua pertanyaan dulu 😭");return}
+ localStorage.setItem("friendQuiz",JSON.stringify({friend,key}));
+ startGuess();
+};
+$("joinBtn").onclick=()=>{
+ let saved=localStorage.getItem("friendQuiz");
+ if(!saved){alert("Belum ada kuis. Buat kuis dulu ya!");return}
+ ({friend,key}=JSON.parse(saved));startGuess();
+};
+function startGuess(){
+ i=0;guesses=[];$("setup").classList.add("hidden");$("home").classList.add("hidden");$("result").classList.add("hidden");$("quiz").classList.remove("hidden");$("quizName").textContent="🎯 "+friend;render();
+}
+function render(){
+ $("counter").textContent=`${i+1}/${questions.length}`;$("fill").style.width=(i/questions.length*100)+"%";$("q").textContent=questions[i][0];$("quizOptions").innerHTML="";$("next").disabled=true;
+ $("next").textContent=i===questions.length-1?"Lihat Hasil ✨":"Lanjut ➜";
+ questions[i][1].forEach((a,j)=>{let b=document.createElement("button");b.className="opt";b.textContent=String.fromCharCode(65+j)+". "+a;b.onclick=()=>{guesses[i]=j;$("quizOptions").querySelectorAll("button").forEach(x=>x.classList.remove("selected"));b.classList.add("selected");$("next").disabled=false};$("quizOptions").appendChild(b)});
+}
+$("next").onclick=()=>{if(i<questions.length-1){i++;render()}else result()};
+function result(){
+ let correct=guesses.filter((x,n)=>x===key[n]).length,pct=Math.round(correct/questions.length*100);
+ let title=pct===100?"SAHABAT SEJATI 🫶":pct>=75?"KENAL BANGET 💗":pct>=50?"LUMAYAN KENAL 😎":pct>=25?"TEMAN KW 👀":"SIAPA INI? 🗿";
+ $("quiz").classList.add("hidden");$("result").classList.remove("hidden");$("resultTitle").textContent=title;$("score").textContent=`${correct}/${questions.length} · ${pct}%`;
+ $("resultText").textContent=`Kamu berhasil menebak ${correct} jawaban tentang ${friend}.`;
+ let wrong=questions.map((x,n)=>guesses[n]!==key[n]?`${n+1}. ${x[1][key[n]]}`:null).filter(Boolean);
+ $("mistakes").textContent=wrong.length?"Yang meleset: "+wrong.join(" • "):"Gila. Semua jawaban tepat. Kamu benar-benar mengenal dia. 😭";
+}
+$("again").onclick=()=>{$("result").classList.add("hidden");$("home").classList.remove("hidden");key=[];guesses=[]};
+$("redo").onclick=()=>startGuess();
+</script>
+</body>
+</html>
